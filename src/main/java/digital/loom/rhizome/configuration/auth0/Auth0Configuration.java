@@ -39,7 +39,7 @@ public class Auth0Configuration implements Serializable {
     private final String           securedRoute;
     private final String           signingAlgorithm;
     private final boolean          base64EncodedSecret;
-    private final String           token;
+    private final Optional<String> token;
     private final Optional<String> publicKeyPath;
 
     public Auth0Configuration(
@@ -50,8 +50,7 @@ public class Auth0Configuration implements Serializable {
             String securedRoute,
             String authorityStrategy,
             String signingAlgorithm,
-            boolean base64EncodedSecret,
-            String token ) {
+            boolean base64EncodedSecret) {
         this(
                 domain,
                 issuer,
@@ -61,7 +60,7 @@ public class Auth0Configuration implements Serializable {
                 authorityStrategy,
                 base64EncodedSecret,
                 signingAlgorithm,
-                token,
+                Optional.absent(),
                 Optional.absent() );
     }
 
@@ -75,7 +74,7 @@ public class Auth0Configuration implements Serializable {
             @JsonProperty( AUTHORITY_STRATEGY_FIELD ) String authorityStrategy,
             @JsonProperty( BASE64_ENCODED_SECRET_FIELD ) boolean base64EncodedSecret,
             @JsonProperty( SIGNING_ALGORITHM_FIELD ) String signingAlgorithm,
-            @JsonProperty( TOKEN_FIELD ) String token,
+            @JsonProperty( TOKEN_FIELD ) Optional<String> token,
             @JsonProperty( PUBLIC_KEY_PATH_FIELD ) Optional<String> publicKeyPath ) {
         Preconditions.checkArgument( StringUtils.isNotBlank( domain ), "Domain cannot be blank" );
         Preconditions.checkArgument( StringUtils.isNotBlank( issuer ), "Domain cannot be blank" );
@@ -85,7 +84,6 @@ public class Auth0Configuration implements Serializable {
         Preconditions.checkArgument( StringUtils.isNotBlank( authorityStrategy ),
                 "Authority strategyic cannot be blank" );
         Preconditions.checkArgument( StringUtils.isNotBlank( signingAlgorithm ), "Signing algorithm cannot be blank" );
-        Preconditions.checkArgument( StringUtils.isNoneBlank( token ), "Token cannot be blank." );
         this.domain = domain;
         this.issuer = issuer;
         this.clientId = clientId;
@@ -94,7 +92,7 @@ public class Auth0Configuration implements Serializable {
         this.authorityStrategy = authorityStrategy;
         this.base64EncodedSecret = base64EncodedSecret;
         this.signingAlgorithm = signingAlgorithm;
-        this.token = token;
+        this.token = Preconditions.checkNotNull( token, "token cannot be null." );
         this.publicKeyPath = Preconditions.checkNotNull( publicKeyPath, "Public key path cannot be null." );
     }
 
@@ -144,7 +142,7 @@ public class Auth0Configuration implements Serializable {
     }
 
     @JsonProperty( TOKEN_FIELD )
-    public String getToken() {
+    public Optional<String> getToken() {
         return token;
     }
 }
